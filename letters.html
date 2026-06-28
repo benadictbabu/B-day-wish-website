@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    if (!window.location.search.includes('auth=true')) {
+        window.location.href = 'index.html';
+    }
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B'day Surprise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Dancing+Script:wght@700&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); 
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden; 
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 38px;
+            margin-bottom: 40px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.3);
+            text-align: center;
+        }
+
+        /* Side by Side Envelopes (3 items fit perfectly now) */
+        .envelopes-wrapper {
+            display: flex;
+            gap: 50px; /* Reduced gap to fit 3 covers perfectly on laptop */
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .cover-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .envelope {
+            width: 300px; 
+            height: 200px; 
+            background: #ff4766;
+            position: relative;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+
+        .envelope:hover {
+            transform: translateY(-12px);
+        }
+
+        .envelope::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 110px solid #ff758c;
+            border-radius: 10px 10px 0 0;
+            z-index: 1;
+        }
+
+        .envelope::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-bottom: 95px solid #e83a56;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .heart {
+            font-size: 45px;
+            position: absolute;
+            z-index: 5;
+            top: 80px;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .cover-text {
+            color: #ff9a9e;
+            font-size: 16px;
+            text-align: center;
+            margin: 25px 0 20px 0;
+            max-width: 280px; 
+            font-weight: 500;
+            line-height: 1.5;
+            min-height: 50px; /* Keep buttons aligned */
+        }
+
+        .open-btn {
+            background: linear-gradient(45deg, #00C9FF, #92FE9D);
+            color: #121212;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 201, 255, 0.3);
+            transition: 0.3s;
+        }
+        .open-btn:hover { transform: scale(1.05); }
+
+        /* MODALS */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+        .modal.show { opacity: 1; pointer-events: auto; }
+
+        .close-btn {
+            position: absolute;
+            top: 20px; right: 30px;
+            font-size: 45px;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            z-index: 10;
+        }
+        .close-btn:hover { color: #ff4766; transform: scale(1.1); }
+
+        /* --- VIDEO CONTAINER --- */
+        .video-container {
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh; 
+            background: #000;
+            border-radius: 15px;
+            padding: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            border: 2px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        video { 
+            width: 100%; 
+            max-height: 80vh; 
+            border-radius: 10px; 
+            outline: none; 
+            object-fit: contain; 
+            background: #000;
+        }
+
+        /* --- AESTHETIC VINTAGE LETTER --- */
+        .vintage-letter {
+            background: #f4e4bc; 
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh; 
+            overflow-y: auto; 
+            padding: 40px;
+            border-radius: 5px;
+            box-shadow: inset 0 0 50px rgba(139, 69, 19, 0.15), 0 15px 40px rgba(0,0,0,0.6);
+            position: relative;
+            color: #3e2723; 
+        }
+
+        .vintage-letter::-webkit-scrollbar { width: 10px; }
+        .vintage-letter::-webkit-scrollbar-track { background: #f4e4bc; border-radius: 5px; }
+        .vintage-letter::-webkit-scrollbar-thumb { background: #cba365; border-radius: 5px; }
+        
+        .vintage-letter::before {
+            content: ''; position: absolute; top: 0; right: 0;
+            border-width: 0 30px 30px 0;
+            border-style: solid;
+            border-color: #d7c59e #121212 #d7c59e #d7c59e;
+            box-shadow: -2px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .letter-heading {
+            font-family: 'Dancing Script', cursive;
+            font-size: 40px;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #8e1c1c;
+        }
+
+        .letter-body {
+            font-family: 'Lora', serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+            font-size: 18px;
+            line-height: 1.8;
+            text-align: justify;
+        }
+
+        .letter-signature {
+            font-family: 'Dancing Script', cursive;
+            font-size: 30px;
+            text-align: right;
+            margin-top: 30px;
+            font-weight: bold;
+        }
+
+        /* --- PHONE GALLERY STYLE --- */
+        .gallery-container {
+            width: 90%;
+            max-width: 1000px;
+            max-height: 85vh;
+            background: #1e1e1e;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            overflow-y: auto;
+            display: grid;
+            /* Grid layout matching a phone gallery */
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .gallery-container::-webkit-scrollbar { width: 10px; }
+        .gallery-container::-webkit-scrollbar-track { background: #1e1e1e; border-radius: 10px; }
+        .gallery-container::-webkit-scrollbar-thumb { background: #ff4766; border-radius: 10px; }
+
+        .gallery-img {
+            width: 100%;
+            height: 200px; /* Perfect square/rectangle blocks */
+            object-fit: cover; /* Prevents images from stretching */
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        .gallery-img:hover {
+            transform: scale(1.05); /* Zoom effect on hover */
+        }
+
+        /* --- LIGHTBOX (Zoom View Popup) --- */
+        .lightbox-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .lightbox-modal.show { opacity: 1; pointer-events: auto; }
+        
+        #lightboxImg {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            animation: zoomIn 0.3s ease;
+        }
+        @keyframes zoomIn { from { transform: scale(0.8); } to { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <h1>Choose Your Surprises one by one 🎁</h1>
+
+    <div class="envelopes-wrapper">
+        
+        <div class="cover-box">
+            <div class="envelope">
+                <div class="heart">❤️</div>
+            </div>
+            <p class="cover-text">Click here to watch me singing a special Birthday song just for you! 🎤😂</p>
+            <button class="open-btn" id="openVideoBtn">Open Video 🎥</button>
+        </div>
+
+        <div class="cover-box">
+            <div class="envelope">
+                <div class="heart">📸</div>
+            </div>
+            <p class="cover-text">Click here to see your Favourite photos 📸💖</p>
+            <button class="open-btn" id="openGalleryBtn" style="background: linear-gradient(45deg, #feca57, #ff9f43);">Open Gallery 🖼️</button>
+        </div>
+
+        <div class="cover-box">
+            <div class="envelope">
+                <div class="heart">💌</div>
+            </div>
+            <p class="cover-text">Click here to see a special Birthday letter I wrote exclusively for you! ✨</p>
+            <button class="open-btn" id="openLetterBtn" style="background: linear-gradient(45deg, #ff758c, #ff7eb3);">Read Letter 📜</button>
+        </div>
+
+    </div>
+
+    <div class="modal" id="videoModal">
+        <span class="close-btn" id="closeVideo">&times;</span>
+        <div class="video-container">
+            <video id="myVideo" controls>
+                <source src="video.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+
+    <div class="modal" id="galleryModal">
+        <span class="close-btn" id="closeGallery">&times;</span>
+        <div class="gallery-container">
+            <img src="img1.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img2.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img3.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img5.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img6.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img7.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img8.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img9.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img10.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img11.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img12.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img13.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img14.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img15.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img16.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img17.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img18.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img19.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img20.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img21.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img22.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img23.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img24.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img25.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img26.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img27.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img28.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img29.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img30.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img31.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img32.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img33.jpeg" class="gallery-img" alt="Add Photo">
+            <img src="img34.jpeg" class="gallery-img" alt="Add Photo">
+            
+            </div>
+    </div>
+
+    <div class="modal" id="letterModal">
+        <span class="close-btn" id="closeLetter">&times;</span>
+        <div class="vintage-letter">
+            <h2 class="letter-heading">To My Dearest Friend, [Name]</h2>
+            <div class="letter-body">
+                Write your beautiful birthday wishes here... <br><br>
+                This space is completely yours. You can change this text from the HTML code. Just type everything you want to say to friend. The font is specially chosen to look like a real handwritten letter on vintage paper. <br><br>
+                Wishing you the happiest birthday ever!
+            </div>
+            <div class="letter-signature">
+                With love,<br>
+                [My Name]
+            </div>
+        </div>
+    </div>
+
+    <div class="lightbox-modal" id="lightboxModal">
+        <span class="close-btn" id="closeLightbox" style="z-index: 210;">&times;</span>
+        <img id="lightboxImg" src="" alt="Zoomed Memory">
+    </div>
+
+    <script>
+        // Video Modal
+        const openVideoBtn = document.getElementById('openVideoBtn');
+        const videoModal = document.getElementById('videoModal');
+        const closeVideo = document.getElementById('closeVideo');
+        const myVideo = document.getElementById('myVideo');
+
+        openVideoBtn.addEventListener('click', () => { videoModal.classList.add('show'); myVideo.play(); });
+        closeVideo.addEventListener('click', () => { videoModal.classList.remove('show'); myVideo.pause(); myVideo.currentTime = 0; });
+
+        // Gallery Modal
+        const openGalleryBtn = document.getElementById('openGalleryBtn');
+        const galleryModal = document.getElementById('galleryModal');
+        const closeGallery = document.getElementById('closeGallery');
+
+        openGalleryBtn.addEventListener('click', () => { galleryModal.classList.add('show'); });
+        closeGallery.addEventListener('click', () => { galleryModal.classList.remove('show'); });
+
+        // Letter Modal
+        const openLetterBtn = document.getElementById('openLetterBtn');
+        const letterModal = document.getElementById('letterModal');
+        const closeLetter = document.getElementById('closeLetter');
+
+        openLetterBtn.addEventListener('click', () => { letterModal.classList.add('show'); });
+        closeLetter.addEventListener('click', () => { letterModal.classList.remove('show'); });
+
+        // Zoom (Lightbox) Feature Logic
+        const galleryImgs = document.querySelectorAll('.gallery-img');
+        const lightboxModal = document.getElementById('lightboxModal');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const closeLightbox = document.getElementById('closeLightbox');
+
+        galleryImgs.forEach(img => {
+            img.addEventListener('click', () => {
+                lightboxImg.src = img.src; 
+                lightboxModal.classList.add('show');
+            });
+        });
+
+        // Close Zoom View
+        closeLightbox.addEventListener('click', () => { lightboxModal.classList.remove('show'); });
+        lightboxModal.addEventListener('click', (e) => { if(e.target === lightboxModal) lightboxModal.classList.remove('show'); });
+    </script>
+
+</body>
+</html>

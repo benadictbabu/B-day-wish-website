@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+    if (!window.location.search.includes('auth=true')) {
+        window.location.href = 'index.html';
+    }
+</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B'day Surprise</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); 
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            padding: 20px;
+            overflow: hidden; 
+        }
+
+        .glass-box {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            max-width: 650px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .cat-img {
+            width: 100%;
+            max-width: 200px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        p, h2 { font-size: 18px; line-height: 1.6; margin-bottom: 25px; }
+        .highlight-text { color: #ff9a9e; font-weight: 600; }
+
+        /* Buttons Styling */
+        .btn-primary, .next-btn {
+            background: linear-gradient(45deg, #00C9FF, #92FE9D); 
+            color: #121212;
+            border: none;
+            padding: 10px 30px;
+            font-size: 18px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 201, 255, 0.3);
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn-primary:hover, .next-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(0, 201, 255, 0.6);
+        }
+
+        /* Side by Side Layout for Options */
+        .options-row {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            position: relative;
+            min-height: 120px; /* Space for jumping buttons */
+            align-items: center;
+        }
+
+        .quiz-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .quiz-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .fade-out { opacity: 0; pointer-events: none; } 
+        
+        .grid-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .grid-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 5px;
+            font-size: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .grid-btn:hover { background: #00C9FF; color: #121212; border-color: #00C9FF; }
+
+        .message-text {
+            color: #00C9FF; 
+            font-size: 20px;
+            margin: 15px 0;
+            font-weight: 600;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        #quiz-section { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="glass-box" id="main-box">
+        
+        <div id="intro-section">
+            <img src="fun-cat.jpg" alt="Funny Cat" class="cat-img">
+            <p>
+                Wait, wait! 🛑 <br><br>
+                Before you get your surprise, I need to test your brain. You will get the surprises <span class="highlight-text">ONLY</span> if you answer my questions correctly. Ready? 
+            </p>
+            <button class="btn-primary" id="startQuizBtn">OK</button>
+        </div>
+
+        <!-- QUIZ SECTION -->
+        <div id="quiz-section"></div>
+
+    </div>
+
+    <script>
+        const introSection = document.getElementById('intro-section');
+        const quizSection = document.getElementById('quiz-section');
+
+        document.getElementById('startQuizBtn').addEventListener('click', () => {
+            introSection.style.display = 'none';
+            quizSection.style.display = 'block';
+            loadQuestion1();
+        });
+
+        // ================= QUESTION 1 =================
+        function loadQuestion1() {
+            quizSection.innerHTML = `
+                <h2>Question 1: Honestly, how much brain do you have? 🧠</h2>
+                <div class="options-row" id="q1-container">
+                    <button id="btn-100" class="quiz-btn">100%</button>
+                    <button id="btn-0" class="quiz-btn">0%</button>
+                </div>
+                <div id="msg-1" class="message-text">Yeahh! I Already knew it! 😂😌</div>
+                <button id="next-1" class="next-btn" style="display:none;">Next</button>
+            `;
+
+            const btn100 = document.getElementById('btn-100');
+            const btn0 = document.getElementById('btn-0');
+            const msg1 = document.getElementById('msg-1');
+            const next1 = document.getElementById('next-1');
+            const container = document.getElementById('q1-container');
+
+            const escapePositions = [
+                { left: '10%', top: '10%' },
+                { left: '70%', top: '70%' },
+                { left: '10%', top: '70%' },
+                { left: '70%', top: '10%' }
+            ];
+            let posIndex = 0;
+
+            btn100.addEventListener('mouseover', () => {
+                btn100.style.position = 'absolute';
+                btn100.style.left = escapePositions[posIndex % 4].left;
+                btn100.style.top = escapePositions[posIndex % 4].top;
+                posIndex++;
+            });
+
+            btn0.addEventListener('click', () => {
+                msg1.style.display = 'block';
+                next1.style.display = 'inline-block';
+                btn100.style.display = 'none'; 
+            });
+
+            next1.addEventListener('click', loadQuestion2);
+        }
+
+        // ================= QUESTION 2 =================
+        function loadQuestion2() {
+            quizSection.innerHTML = `
+                <h2>Question 2: Where are you actually coming from? 🌍</h2>
+                <div class="options-row">
+                    <button id="btn-a" class="quiz-btn">actual place 1</button>
+                    <button id="btn-b" class="quiz-btn">actual place 2</button>
+                    <button id="btn-c" class="quiz-btn">funny place to select</button>
+                </div>
+                <div id="msg-2" class="message-text">Wow, you answered this question also correctly! 🥹❤️</div>
+                <button id="next-2" class="next-btn" style="display:none;">Next</button>
+            `;
+
+            const btnA = document.getElementById('btn-a');
+            const btnB = document.getElementById('btn-b');
+            const btnC = document.getElementById('btn-c');
+            const msg2 = document.getElementById('msg-2');
+            const next2 = document.getElementById('next-2');
+
+            btnA.addEventListener('mouseover', () => btnA.classList.add('fade-out'));
+            btnB.addEventListener('mouseover', () => btnB.classList.add('fade-out'));
+
+            btnC.addEventListener('click', () => {
+                msg2.style.display = 'block';
+                next2.style.display = 'inline-block';
+            });
+
+            next2.addEventListener('click', loadQuestion3);
+        }
+
+        // ================= QUESTION 3 =================
+        // ================= QUESTION 3 =================
+        function loadQuestion3() {
+            quizSection.innerHTML = `
+                <h2>Question 3: Who is your best friend? 🤔</h2>
+                <p style="font-size: 18px; margin-bottom: 25px; font-weight: 500; color: #ff9a9e;">
+                    I think this question will be very confusing. Because there are many options that you have to select one from it.
+                </p>
+                
+                
+                <button id="showOptionsBtn" class="btn-primary" style="display:none; margin: 0 auto;">Show Options</button>
+                
+                <div id="grid-container" class="grid-options" style="display:none;"></div>
+                
+                <div id="msg-3" class="message-text">Thankyou for choosing me. I already knew it 🥹💓</div>
+                <button id="next-3" class="next-btn" style="display:none;">Next</button>
+            `;
+
+            const showBtn = document.getElementById('showOptionsBtn');
+            const gridContainer = document.getElementById('grid-container');
+            const msg3 = document.getElementById('msg-3');
+            const next3 = document.getElementById('next-3');
+
+            setTimeout(() => {
+                showBtn.style.display = 'inline-block';
+            }, 3000);
+
+            showBtn.addEventListener('click', () => {
+                showBtn.style.display = 'none';
+                gridContainer.style.display = 'grid';
+                
+                for (let i = 0; i < 30; i++) {
+                    let btn = document.createElement('button');
+                    btn.className = 'grid-btn';
+                    btn.innerText = '"My name"';
+                    btn.addEventListener('click', () => {
+                        gridContainer.style.opacity = '0.3'; 
+                        gridContainer.style.pointerEvents = 'none';
+                        msg3.style.display = 'block';
+                        next3.style.display = 'inline-block';
+                    });
+                    gridContainer.appendChild(btn);
+                }
+            });
+
+            next3.addEventListener('click', loadQuestion4);
+        }
+        // ================= QUESTION 4 =================
+        function loadQuestion4() {
+            quizSection.innerHTML = `
+                <h2>Question 4: Who is your favorite person/persons in the world? 🌎</h2>
+                <div class="options-row">
+                    <button class="quiz-btn final-opt">Father</button>
+                    <button class="quiz-btn final-opt">Mother</button>
+                    <button class="quiz-btn final-opt">Father and Mother</button>
+                    <button class="quiz-btn final-opt">All of the above</button>
+                </div>
+                <div id="msg-4" class="message-text">
+    Aww, that's so cute! 🥹❤️ <br><br>
+    <span style="font-size: 16px; color: white; font-weight: 400;">You have answered all questions correctly 😎</span>
+</div>
+                <button id="next-4" class="next-btn" style="display:none; background: linear-gradient(45deg, #ff00cc, #333399); color: white;">Get My Surprises please</button>
+            `;
+
+            const finalOpts = document.querySelectorAll('.final-opt');
+            const msg4 = document.getElementById('msg-4');
+            const next4 = document.getElementById('next-4');
+
+            finalOpts.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    msg4.style.display = 'block';
+                    next4.style.display = 'inline-block';
+                    finalOpts.forEach(b => b.style.pointerEvents = 'none');
+                });
+            });
+
+            next4.addEventListener('click', () => {
+    window.location.href = "surprise.html?auth=true"; 
+});
+        }
+    </script>
+
+</body>
+</html>
